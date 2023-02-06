@@ -19,7 +19,6 @@ function hooks_scripts() {
 	/**
 	 * Highlight JS for all my custom code blocks
 	 */
-
 	wp_enqueue_style(
 		'highlight_stylesheet',
 		'//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/default.min.css',
@@ -35,6 +34,9 @@ function hooks_scripts() {
 		filemtime( get_template_directory() . '/scripts/highlight.js'),
 		false
 	);
+	/**
+	 * Base JS scripting
+	 */
 	wp_enqueue_script(
 		'script',
 		get_template_directory_uri() . '/scripts/base.js',
@@ -43,6 +45,9 @@ function hooks_scripts() {
 		false
 	);
 
+	/**
+	 * Base CSS styling
+	 */
 	wp_enqueue_style(
 		'base_stylesheet',
 		get_template_directory_uri() . '/style.css',
@@ -55,8 +60,7 @@ add_action( 'wp_enqueue_scripts', 'hooks_scripts' );
 
 
 
-/* ## 	Wrap Template Content with
-		our custom header and footer.
+/* ## 	Wrap Template Content with a header and footer.
 --------------------------------------------- */
 add_filter( 'template_include', function( $template ) {
 	get_header();
