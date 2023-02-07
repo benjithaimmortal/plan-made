@@ -41,11 +41,26 @@ add_action( 'rest_api_init', function () {
       'callback' => 'endpoint_commander',
   ) );
 } );
-
 function endpoint_commander() {
-  return array(
-    'POST' => $_POST,
-    'FILES' => $_FILES,
-    'GET' => $_GET
+  $update = (is_array($_POST)) ? $_POST : 'no post?';
+  $update_str = (update_post_meta(59, 'debug', $update) !== false) ? "We got it" : "We didn't get it";
+  $body = array(
+    "response_type" => "ephemeral",
+    "text" => "Thanks!",
+    "blocks" => array(
+      array (
+        "type" => "section",
+        "text" => array(
+          "type" => "mrkdwn",
+          "text" => $update_str
+        )
+      )
+    )
   );
+  $response = new WP_REST_Response(
+    $body,
+    200,
+  );
+  $response->set_headers(array('Content-Type','application/json'));
+  return $response;
 }

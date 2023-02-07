@@ -63,6 +63,6 @@ function global_entry_checker() {
   $to = 'benjamin.kostenbader@gmail.com';
   $title = 'Appointments available in Pittsburgh';
   $body = $response['response'];
-  slackbot("Hey @Benji, schedule an appointment at https://ttp.cbp.dhs.gov/ \n```$body```");
+  slackbot("Hey @benjamin.kostenbader, schedule an appointment at https://ttp.cbp.dhs.gov/\nRequest: $url\nResponse:```$body```");
   // wp_mail($to, $title, $body, 'Content-Type: text/html; charset=UTF-8');
 }
