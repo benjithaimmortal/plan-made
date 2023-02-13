@@ -34,10 +34,10 @@ function cron_one_minute( $schedules ) {
  * register_activation_hook(__FILE__, 'my_hookname') {}
  */
 function schedule_crons(){
-  if( ! wp_next_scheduled( 'action_name' )){
-      // Schedule the event for right now, then to repeat every 15 minutes using the hook 'action_name'
-      wp_schedule_event( time(), 'five_minutes', 'action_name' );
-  }
+  // if( ! wp_next_scheduled( 'action_name' )){
+  //     // Schedule the event for right now, then to repeat every 15 minutes using the hook 'action_name'
+  //     wp_schedule_event( time(), 'five_minutes', 'action_name' );
+  // }
   // if( ! wp_next_scheduled( 'other_action_name' )){
   //     wp_schedule_event( time(), 'twenty_minutes', 'other_action_name' );
   // }
@@ -51,18 +51,27 @@ schedule_crons();
 /**
  * Here's where we define the processes that the crons will fire
  */
-add_action( 'action_name', 'global_entry_checker' );
+add_action( 'global_entry', 'global_entry_checker' );
 
 function global_entry_checker() {
   // code here
 
   $response = Global_Entry_Scraper::request($url);
   $response_decoded = $response['response_decoded'];
-  if (!count($response_decoded)) return;
+  if (!count($response_decoded)) return "No results";
+  if (strtotime($response_decoded[0]['startTimestamp']) > strtotime("May 1, 2023")) return "Too late: " . $response_decoded[0]['startTimestamp'];
 
+  $body = "Available appointment times: (Before May 1)";
+  foreach ($response_decoded as $slot){
+    if (strtotime($slot['startTimestamp']) > strtotime("May 1, 2023")) break;
+    $body .= "\n{$slot['startTimestamp']}";
+  }
+
+  // $body = json_encode($body, JSON_PRETTY_PRINT);
   $to = 'benjamin.kostenbader@gmail.com';
   $title = 'Appointments available in Pittsburgh';
-  $body = $response['response'];
-  slackbot("Hey @benjamin.kostenbader, schedule an appointment at https://ttp.cbp.dhs.gov/\nRequest: $url\nResponse:```$body```");
+  $body = strlen($body > 1000) ? substr($body, 0, 1000) . "..." : $body;
+  $response = slackbot("Hey @benjamin.kostenbader, schedule an appointment at https://ttp.cbp.dhs.gov/\nRequest: $url\nResponse:```$body```");
+  return '<pre>' . json_encode(array($response_decoded, $body), JSON_PRETTY_PRINT) . '</pre>';
   // wp_mail($to, $title, $body, 'Content-Type: text/html; charset=UTF-8');
 }
